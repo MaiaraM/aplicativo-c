@@ -61,13 +61,16 @@ namespace site.Admin
 
                     CarregarGrid();
                     LimparCampos();
+                    lblMensagem.Text = "Usuário cadastrado com sucesso!";
+
                 }
                 catch (Exception ex) {
+                    lblMensagem.Text = "Erro ao salvar";
+
                     Page.ClientScript.RegisterStartupScript(this.GetType(), "ErrorAlert", "Erro ao tentar fazer cadastro /n" + ex.Message.ToString(), true);
                 }
 
             }
-            lblMensagem.Text = "Usuário cadastrado com sucesso!";
         }
 
         protected void LimparCampos()
