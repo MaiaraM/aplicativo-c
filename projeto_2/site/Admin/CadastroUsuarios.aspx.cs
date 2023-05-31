@@ -14,6 +14,8 @@ namespace site.Admin
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            acesso.DataProviderName = DAO.ProviderName.OleDb;
+            acesso.ConnectionString = conexao;
             if (!IsPostBack)
             {
                 CarregarGrid();
@@ -28,7 +30,20 @@ namespace site.Admin
                 lblMensagem.Text = "O campo Nome é obrigatório!";
                 return;
             } else {
+
+                string sql = $"SELECT * FROM Usuarios WHERE NomeAcesso='{txtNomeAcesso.Text}';";               
+
+                /*DataTable tb = new DataTable();
+                tb = (DataTable)acesso.Query(sql);
+
+                if (tb.Rows.Count > 0)
+                {
+                    lblMensagem.Text = "Esse email já está sendo usado";
+                    return;
+                } 
+                */
                 string comando = "";
+
 
                 if (Codigo.Text == "")
                 {
@@ -39,12 +54,18 @@ namespace site.Admin
                     comando = $"UPDATE Usuarios SET NomeCompleto='{txtNomeCompleto.Text}', Email='{txtEmail.Text}', NomeAcesso='{txtNomeAcesso.Text}', Anotacoes='{txtAnotacoes.Text}', Senha='{txtSenha.Text}' WHERE Codigo = {Codigo.Text}";
 
                 }
-                acesso.DataProviderName = DAO.ProviderName.OleDb;
-                acesso.ConnectionString = conexao;
-                acesso.Query(comando);
 
-                CarregarGrid();
-                LimparCampos();
+                try
+                {
+                    acesso.Query(comando);
+
+                    CarregarGrid();
+                    LimparCampos();
+                }
+                catch (Exception ex) {
+                    Page.ClientScript.RegisterStartupScript(this.GetType(), "ErrorAlert", "Erro ao tentar fazer cadastro /n" + ex.Message.ToString(), true);
+                }
+
             }
             lblMensagem.Text = "Usuário cadastrado com sucesso!";
         }
@@ -77,8 +98,6 @@ namespace site.Admin
             Codigo.Text = ViewUsuarios.SelectedRow.Cells[1].Text;
             string comando = $"SELECT * FROM Usuarios WHERE Codigo = {Codigo.Text};";
 
-            acesso.DataProviderName = DAO.ProviderName.OleDb;
-            acesso.ConnectionString = conexao;
             DataTable tabela = new DataTable();
             tabela = (DataTable)acesso.Query(comando);
 
@@ -96,8 +115,6 @@ namespace site.Admin
         {
             string comando = $"DELETE FROM Usuarios WHERE Codigo = {Codigo.Text};";
 
-            acesso.DataProviderName = DAO.ProviderName.OleDb;
-            acesso.ConnectionString = conexao;
             acesso.Query(comando);
             CarregarGrid();
             LimparCampos();
